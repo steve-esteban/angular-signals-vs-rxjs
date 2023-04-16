@@ -14,6 +14,7 @@ import {
   throwError
 } from 'rxjs';
 import { Film, Vehicle, VehicleResponse } from './vehicle';
+import { toSignal } from '@angular/core/rxjs-interop';
 
 @Injectable({
   providedIn: 'root'
@@ -28,7 +29,7 @@ export class VehicleService {
   // First page of vehicles
   // If the price is empty, randomly assign a price
   // (We can't modify the backend in this demo)
-  vehicles$ = this.http.get<VehicleResponse>(this.url).pipe(
+  private vehicles$ = this.http.get<VehicleResponse>(this.url).pipe(
     map((data) =>
       data.results.map((v) => ({
         ...v,
@@ -40,6 +41,9 @@ export class VehicleService {
     shareReplay(1),
     catchError(this.handleError)
   );
+
+  // Expose signals from thus service
+  vehicles = toSignal<Vehicle[],Vehicle[]>(this.vehicles$, {initialValue: []});
 
   // Find the vehicle in the list of vehicles
   selectedVehicle$ = combineLatest([this.vehicles$, 

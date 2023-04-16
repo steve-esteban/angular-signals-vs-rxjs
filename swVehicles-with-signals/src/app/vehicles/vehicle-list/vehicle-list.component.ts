@@ -13,13 +13,7 @@ export class VehicleListComponent {
   pageTitle = 'Vehicles';
   errorMessage = '';
 
-  // Vehicles
-  vehicles$ = this.vehicleService.vehicles$
-    .pipe(
-      catchError(err => {
-        this.errorMessage = err;
-        return EMPTY;
-      }));
+  vehicles = this.vehicleService.vehicles;
 
   selectedVehicle$ = this.vehicleService.selectedVehicle$.pipe(
     catchError(err => {

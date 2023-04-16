@@ -1,9 +1,9 @@
 import { Component } from '@angular/core';
 import { AsyncPipe, DecimalPipe, NgFor, NgIf } from '@angular/common';
 import { catchError, EMPTY, map, tap } from 'rxjs';
-import { CartService } from 'src/app/cart/cart.service';
 import { Vehicle } from '../vehicle';
 import { VehicleService } from '../vehicle.service';
+import { CartService } from 'app/cart/cart.service';
 
 @Component({
   selector: 'sw-vehicle-detail',

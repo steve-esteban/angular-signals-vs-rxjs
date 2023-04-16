@@ -15,12 +15,7 @@ export class VehicleListComponent {
 
   vehicles = this.vehicleService.vehicles;
 
-  selectedVehicle$ = this.vehicleService.selectedVehicle$.pipe(
-    catchError(err => {
-      this.errorMessage = err;
-      return EMPTY;
-    })
-  );
+  selectedVehicle = this.vehicleService.selectedVehicle;
 
   constructor(private vehicleService: VehicleService) { }
 

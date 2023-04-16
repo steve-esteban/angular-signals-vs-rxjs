@@ -10,7 +10,7 @@
       <button type="button"
               class="list-group-item"
               *ngFor="let vehicle of vehicles()"
-              [ngClass]="{'active': vehicle?.name === (selectedVehicle$ | async)?.name}"
+              [ngClass]="{'active': vehicle?.name === (selectedVehicle())?.name}"
               (click)="onSelected(vehicle.name)">
         {{ vehicle.name }}
       </button>

@@ -1,5 +1,5 @@
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { Injectable, signal } from '@angular/core';
 import {
   BehaviorSubject,
   catchError,
@@ -14,17 +14,13 @@ import {
   throwError
 } from 'rxjs';
 import { Film, Vehicle, VehicleResponse } from './vehicle';
-import { toSignal } from '@angular/core/rxjs-interop';
+import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 
 @Injectable({
   providedIn: 'root'
 })
 export class VehicleService {
   private url = 'https://swapi.py4e.com/api/vehicles';
-
-  // Action stream
-  private vehicleSelectedSubject = new BehaviorSubject<string>('');
-  vehicleSelected$ = this.vehicleSelectedSubject.asObservable();
 
   // First page of vehicles
   // If the price is empty, randomly assign a price
@@ -44,15 +40,10 @@ export class VehicleService {
 
   // Expose signals from thus service
   vehicles = toSignal<Vehicle[],Vehicle[]>(this.vehicles$, {initialValue: []});
+  selectedVehicle = signal<Vehicle | undefined>(undefined);
 
-  // Find the vehicle in the list of vehicles
-  selectedVehicle$ = combineLatest([this.vehicles$, 
-                                     this.vehicleSelected$]).pipe(
-    map(([vehicles, vehicleName]) => vehicles.find((v) => v.name === vehicleName)
-    )
-  );
 
-  vehicleFilms$ = this.selectedVehicle$.pipe(
+ private vehicleFilms$ = toObservable(this.selectedVehicle).pipe(
     filter(Boolean),
     switchMap(vehicle =>
       forkJoin(vehicle.films.map(link =>
@@ -60,11 +51,14 @@ export class VehicleService {
     )
   );
 
+  vehicleFilms = toSignal<Film[],Film[]>(this.vehicleFilms$, { initialValue: []});
+
   constructor(private http: HttpClient) {
   }
 
   vehicleSelected(vehicleName: string) {
-    this.vehicleSelectedSubject.next(vehicleName);
+    const foundVehicle = this.vehicles().find(v => v.name === vehicleName);
+    this.selectedVehicle.set(foundVehicle);
   }
 
   private handleError(err: HttpErrorResponse): Observable<never> {
